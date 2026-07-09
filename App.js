@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+// 1. Import the new Calendar component
+import { Calendar } from 'react-native-calendars';
 
 export default function App() {
-  // State variables to track user selection
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(''); // New state for Date
   const [selectedTime, setSelectedTime] = useState(null);
 
   const packages = [
@@ -15,13 +17,14 @@ export default function App() {
   const timeSlots = ['9:00 AM', '11:30 AM', '2:00 PM', '4:30 PM'];
 
   const handleBooking = () => {
-    if (!selectedPackage || !selectedTime) {
-      Alert.alert('Error', 'Please select both a package and a time slot.');
+    // Check if everything is selected
+    if (!selectedPackage || !selectedDate || !selectedTime) {
+      Alert.alert('Error', 'Please select a package, a date, and a time slot.');
       return;
     }
     Alert.alert(
       'Booking Confirmed! 🧼',
-      `Your ${selectedPackage.name} is booked for ${selectedTime}. See you there!`
+      `Your ${selectedPackage.name} is booked for ${selectedDate} at ${selectedTime}. See you there!`
     );
   };
 
@@ -52,8 +55,24 @@ export default function App() {
           );
         })}
 
-        {/* Section 2: Choose Time */}
-        <Text style={styles.sectionTitle}>2. Choose Available Time Slot</Text>
+        {/* Section 2: Choose Date (The New Calendar!) */}
+        <Text style={styles.sectionTitle}>2. Choose Date</Text>
+        <View style={styles.calendarContainer}>
+          <Calendar
+            onDayPress={(day) => setSelectedDate(day.dateString)}
+            markedDates={{
+              [selectedDate]: { selected: true, disableTouchEvent: true, selectedColor: '#0284C7' }
+            }}
+            theme={{
+              todayTextColor: '#0284C7',
+              arrowColor: '#0284C7',
+              dotColor: '#0284C7',
+            }}
+          />
+        </View>
+
+        {/* Section 3: Choose Time */}
+        <Text style={styles.sectionTitle}>3. Choose Available Time Slot</Text>
         <View style={styles.grid}>
           {timeSlots.map((time) => {
             const isSelected = selectedTime === time;
@@ -69,7 +88,7 @@ export default function App() {
           })}
         </View>
 
-        {/* Section 3: Book Button */}
+        {/* Section 4: Book Button */}
         <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
           <Text style={styles.bookButtonText}>Confirm Appointment</Text>
         </TouchableOpacity>
@@ -79,7 +98,6 @@ export default function App() {
   );
 }
 
-// Styling (React Native's version of CSS)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -104,7 +122,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#334155',
     marginBottom: 12,
-    marginTop: 12,
+    marginTop: 18,
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -135,6 +153,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#0284C7',
+  },
+  calendarContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    padding: 10,
+    marginBottom: 12,
   },
   grid: {
     flexDirection: 'row',
@@ -168,10 +195,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   bookButtonText: {
     color: '#FFFFFF',
